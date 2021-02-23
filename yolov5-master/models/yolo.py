@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 import torch
 import torch.nn as nn
 
-from models.common import Conv, Bottleneck, SPP, DWConv, Focus, BottleneckCSP, Concat, NMS, autoShape, SELayer
+from models.common import Conv, Bottleneck, SPP, DWConv, Focus, BottleneckCSP, Concat, NMS, autoShape, SELayer, \
+    ChannelAttention
 from models.experimental import MixConv2d, CrossConv, C3, GhostBottleneck
 from utils.autoanchor import check_anchor_order
 from utils.general import make_divisible, check_file, set_logging
@@ -249,6 +250,10 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
             channel, re = args[0], args[1]
             channel = make_divisible(channel * gw, 8) if channel != no else channel
             args = [channel, re]
+        elif m is ChannelAttention:
+            channel, re = args[0], args[1]
+            channel = make_divisible(channel * gw, 8) if channel != no else channel
+            args = [channel, re]
         else:
             c2 = ch[f]
 
@@ -265,7 +270,7 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg', type=str, default='yolov5s_v1.yaml', help='model.yaml')
+    parser.add_argument('--cfg', type=str, default='yolov5s_my.yaml', help='model.yaml')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     opt = parser.parse_args()
     opt.cfg = check_file(opt.cfg)  # check file
